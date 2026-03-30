@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations - QuantityMeasurementApp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-nav {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #1f2937;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .operations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .operation-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border: 3px solid transparent;
+        }
+
+        .operation-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        .operation-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .operation-card h3 {
+            color: #1f2937;
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .operation-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .operations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand" onclick="backToDashboard()">⚡ QuantityMeasurement</div>
+        <div class="navbar-right">
+            <button class="btn-nav back-btn" onclick="backToDashboard()">← Back</button>
+            <button class="btn-nav logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 id="typeTitle">Length Calculations</h1>
+            <p>Choose an operation to perform on your measurements</p>
+        </div>
+
+        <div class="operations-grid" id="operationsGrid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="footer">
+            <p>✨ Select an operation to get started</p>
+        </div>
+    </div>
+
+    <script>
+        const MEASUREMENT_TYPES = {
+            LengthUnit: {
+                name: 'Length',
+                icon: '📏',
+                units: ['FEET', 'INCHES', 'YARDS', 'CENTIMETERS'],
+                operations: [
+                    { name: 'Compare', icon: '⚖️', desc: 'Check if two lengths are equal', action: 'compare' },
+                    { name: 'Convert', icon: '🔄', desc: 'Convert between length units', action: 'convert' },
+                    { name: 'Add', icon: '➕', desc: 'Add two lengths together', action: 'add' },
+                    { name: 'Subtract', icon: '➖', desc: 'Subtract one length from another', action: 'subtract' },
+                    { name: 'Divide', icon: '÷', desc: 'Divide one length by another', action: 'divide' },
+                    { name: 'History', icon: '📊', desc: 'View your calculations', action: 'history' }
+                ]
+            },
+            VolumeUnit: {
+                name: 'Volume',
+                icon: '🥤',
+                units: ['LITER', 'MILLILITER', 'GALLON'],
+                operations: [
+                    { name: 'Compare', icon: '⚖️', desc: 'Check if two volumes are equal', action: 'compare' },
+                    { name: 'Convert', icon: '🔄', desc: 'Convert between volume units', action: 'convert' },
+                    { name: 'Add', icon: '➕', desc: 'Add two volumes together', action: 'add' },
+                    { name: 'Subtract', icon: '➖', desc: 'Subtract one volume from another', action: 'subtract' },
+                    { name: 'Divide', icon: '÷', desc: 'Divide one volume by another', action: 'divide' },
+                    { name: 'History', icon: '📊', desc: 'View your calculations', action: 'history' }
+                ]
+            },
+            WeightUnit: {
+                name: 'Weight',
+                icon: '⚖️',
+                units: ['KILOGRAM', 'GRAM', 'POUND'],
+                operations: [
+                    { name: 'Compare', icon: '⚖️', desc: 'Check if two weights are equal', action: 'compare' },
+                    { name: 'Convert', icon: '🔄', desc: 'Convert between weight units', action: 'convert' },
+                    { name: 'Add', icon: '➕', desc: 'Add two weights together', action: 'add' },
+                    { name: 'Subtract', icon: '➖', desc: 'Subtract one weight from another', action: 'subtract' },
+                    { name: 'Divide', icon: '÷', desc: 'Divide one weight by another', action: 'divide' },
+                    { name: 'History', icon: '📊', desc: 'View your calculations', action: 'history' }
+                ]
+            },
+            TemperatureUnit: {
+                name: 'Temperature',
+                icon: '🌡️',
+                units: ['CELSIUS', 'FAHRENHEIT'],
+                operations: [
+                    { name: 'Compare', icon: '⚖️', desc: 'Check if two temperatures are equal', action: 'compare' },
+                    { name: 'Convert', icon: '🔄', desc: 'Convert between temperature units', action: 'convert' },
+                    { name: 'History', icon: '📊', desc: 'View your calculations', action: 'history' }
+                ]
+            }
+        };
+
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const type = localStorage.getItem('selectedMeasurementType');
+            if (!type || !MEASUREMENT_TYPES[type]) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            displayOperations(type);
+        });
+
+        function displayOperations(type) {
+            const typeData = MEASUREMENT_TYPES[type];
+            document.getElementById('typeTitle').textContent = `${typeData.icon} ${typeData.name} Calculations`;
+
+            const grid = document.getElementById('operationsGrid');
+            grid.innerHTML = '';
+
+            typeData.operations.forEach(op => {
+                const card = document.createElement('div');
+                card.className = 'operation-card';
+                card.innerHTML = `
+                    <div class="operation-icon">${op.icon}</div>
+                    <h3>${op.name}</h3>
+                    <p>${op.desc}</p>
+                    <button class="action-btn" onclick="navigateTo('${op.action}', '${type}')">
+                        ${op.name} →
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function navigateTo(action, type) {
+            localStorage.setItem('selectedMeasurementType', type);
+
+            if (action === 'history') {
+                window.location.href = 'history.html';
+            } else {
+                window.location.href = `${action}.html`;
+            }
+        }
+
+        function backToDashboard() {
+            localStorage.removeItem('selectedMeasurementType');
+            window.location.href = 'dashboard.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
