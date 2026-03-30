@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QuantityMeasurementApp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-email {
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .welcome-section h1 {
+            color: #1f2937;
+            font-size: 36px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .welcome-section p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .measurement-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .measurement-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border: 3px solid transparent;
+        }
+
+        .measurement-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        .measurement-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .measurement-card h2 {
+            color: #1f2937;
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .measurement-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .units-list {
+            color: #667eea;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .explore-btn {
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .explore-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .welcome-section {
+                padding: 24px;
+            }
+
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+
+            .measurement-types-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-brand">⚡ QuantityMeasurement</div>
+        <div class="navbar-right">
+            <span class="user-email" id="userEmail">User</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>🎯 Choose Your Measurement Type</h1>
+            <p>Select a measurement type to perform calculations and conversions</p>
+        </div>
+
+        <!-- Measurement Types Grid -->
+        <div class="section-title">Available Measurement Types</div>
+        <div class="measurement-types-grid">
+            <!-- Length -->
+            <div class="measurement-card" onclick="selectType('LengthUnit')">
+                <div class="measurement-icon">📏</div>
+                <h2>Length</h2>
+                <p>Measure distances and dimensions</p>
+                <div class="units-list">FEET • INCHES • YARDS • CENTIMETERS</div>
+                <button class="explore-btn">Explore Length →</button>
+            </div>
+
+            <!-- Volume -->
+            <div class="measurement-card" onclick="selectType('VolumeUnit')">
+                <div class="measurement-icon">🥤</div>
+                <h2>Volume</h2>
+                <p>Measure capacity and liquid quantities</p>
+                <div class="units-list">LITER • MILLILITER • GALLON</div>
+                <button class="explore-btn">Explore Volume →</button>
+            </div>
+
+            <!-- Weight -->
+            <div class="measurement-card" onclick="selectType('WeightUnit')">
+                <div class="measurement-icon">⚖️</div>
+                <h2>Weight</h2>
+                <p>Measure mass and heaviness</p>
+                <div class="units-list">KILOGRAM • GRAM • POUND</div>
+                <button class="explore-btn">Explore Weight →</button>
+            </div>
+
+            <!-- Temperature -->
+            <div class="measurement-card" onclick="selectType('TemperatureUnit')">
+                <div class="measurement-icon">🌡️</div>
+                <h2>Temperature</h2>
+                <p>Measure heat and cold (Convert & Compare only)</p>
+                <div class="units-list">CELSIUS • FAHRENHEIT</div>
+                <button class="explore-btn">Explore Temperature →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="container">
+        <div class="footer">
+            <p>✨ Built with precision and care | Select a measurement type to get started</p>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlAccessToken = urlParams.get('accessToken');
+            const urlRefreshToken = urlParams.get('refreshToken');
+            const urlEmail = urlParams.get('email');
+
+            if (urlAccessToken && urlRefreshToken) {
+                localStorage.setItem('accessToken', urlAccessToken);
+                localStorage.setItem('refreshToken', urlRefreshToken);
+                localStorage.setItem('email', urlEmail);
+                localStorage.setItem('provider', 'Google');
+            }
+
+            const accessToken = localStorage.getItem('accessToken');
+            const email = localStorage.getItem('email');
+
+            if (!accessToken) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('userEmail').textContent = email || 'User';
+        });
+
+        function selectType(type) {
+            localStorage.setItem('selectedMeasurementType', type);
+            window.location.href = 'operations.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
