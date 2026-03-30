@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculation History - QuantityMeasurementApp</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f9fafb; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e5e7eb; padding: 16px 30px; display: flex; justify-content: space-between; }
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #2563eb; cursor: pointer; }
+        .navbar-right { display: flex; gap: 15px; }
+        .logout-btn, .back-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        .back-btn { background-color: #6b7280; color: white; }
+        .back-btn:hover { background-color: #4b5563; }
+        .logout-btn { background-color: #dc2626; color: white; }
+        .logout-btn:hover { background-color: #b91c1c; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .card { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 30px; }
+        h1 { color: #1f2937; font-size: 28px; margin-bottom: 10px; }
+        .filters { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .loading { text-align: center; color: #2563eb; padding: 40px; }
+        .no-data { text-align: center; color: #6b7280; padding: 40px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #f3f4f6; padding: 12px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 12px; border-bottom: 1px solid #e5e7eb; color: #374151; }
+        tr:hover { background-color: #f9fafb; }
+        .success { color: #15803d; }
+        .error { color: #991b1b; }
+        .error-section { background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 20px; color: #991b1b; display: none; }
+        .error-section.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand" onclick="goToDashboard()">QuantityMeasurement</div>
+        <div class="navbar-right">
+            <button class="back-btn" onclick="goToDashboard()">← Back to Dashboard</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>📊 Calculation History</h1>
+
+            <div class="filters">
+                <select id="operationFilter" onchange="loadHistory()">
+                    <option value="">All Operations</option>
+                    <option value="COMPARE">Compare</option>
+                    <option value="CONVERT">Convert</option>
+                    <option value="ADD">Add</option>
+                    <option value="SUBTRACT">Subtract</option>
+                    <option value="DIVIDE">Divide</option>
+                </select>
+                <select id="typeFilter" onchange="loadHistory()">
+                    <option value="">All Types</option>
+                    <option value="LengthUnit">Length</option>
+                    <option value="VolumeUnit">Volume</option>
+                </select>
+                <button onclick="loadHistory()" style="padding: 8px 16px; background-color: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">Refresh</button>
+            </div>
+
+            <div id="loading" class="loading">⏳ Loading history...</div>
+            <div id="noData" class="no-data" style="display: none;">📭 No calculations found</div>
+            <div id="errorSection" class="error-section"></div>
+
+            <div id="historyContainer" class="table-container" style="display: none;">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Type</th>
+                            <th>Input 1</th>
+                            <th>Input 2</th>
+                            <th>Result</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) window.location.href = 'index.html';
+            loadHistory();
+        });
+
+        function goToDashboard() { window.location.href = 'dashboard.html'; }
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+        async function loadHistory() {
+            const operation = document.getElementById('operationFilter').value;
+            const type = document.getElementById('typeFilter').value;
+
+            let endpoint = '';
+            if (operation) {
+                endpoint = `/api/v1/quantities/history/operation/${operation}`;
+            } else if (type) {
+                endpoint = `/api/v1/quantities/history/type/${type}`;
+            } else {
+                endpoint = `/api/v1/quantities/history/operation/ADD`; // Default, change if you have a get-all endpoint
+            }
+
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('historyContainer').style.display = 'none';
+                document.getElementById('noData').style.display = 'none';
+                document.getElementById('errorSection').classList.remove('show');
+
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`http://localhost:8080${endpoint}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        document.getElementById('noData').style.display = 'block';
+                        return;
+                    }
+                    const error = await response.json();
+                    showError(`Error: ${error.message || 'Failed to load history'}`);
+                    return;
+                }
+
+                const history = await response.json();
+
+                if (!Array.isArray(history) || history.length === 0) {
+                    document.getElementById('noData').style.display = 'block';
+                    return;
+                }
+
+                const tbody = document.getElementById('historyBody');
+                tbody.innerHTML = '';
+
+                history.forEach(item => {
+                    const row = document.createElement('tr');
+                    const status = item.errorMessage ? `<span class="error">❌ Error</span>` : `<span class="success">✅ Success</span>`;
+                    row.innerHTML = `
+                        <td>${item.operationType || 'N/A'}</td>
+                        <td>${item.measurementType || 'N/A'}</td>
+                        <td>${item.inputValue1} ${item.inputUnit1}</td>
+                        <td>${item.inputValue2} ${item.inputUnit2}</td>
+                        <td>${item.result || item.errorMessage || 'N/A'}</td>
+                        <td>${status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                document.getElementById('historyContainer').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                showError(`Network error: ${error.message}`);
+            }
+        }
+
+        function showError(message) {
+            const errorSection = document.getElementById('errorSection');
+            errorSection.textContent = message;
+            errorSection.classList.add('show');
+        }
+    </script>
+</body>
+</html>
