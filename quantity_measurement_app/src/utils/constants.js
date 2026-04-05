@@ -1,4 +1,8 @@
-export const API_BASE_URL = 'http://localhost:8080';
+const envApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const normalizedEnvApiBaseUrl = envApiBaseUrl ? envApiBaseUrl.replace(/\/+$/, '') : '';
+const devFallbackApiBaseUrl = 'http://localhost:8080';
+
+export const API_BASE_URL = normalizedEnvApiBaseUrl || (import.meta.env.DEV ? devFallbackApiBaseUrl : '');
 
 export const MEASUREMENT_TYPES = [
   {

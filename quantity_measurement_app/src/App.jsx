@@ -20,20 +20,12 @@ function App() {
           
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
+            element={<Dashboard />}
           />
           
           <Route
             path="/operations/:type"
-            element={
-              <ProtectedRoute>
-                <OperationsPage />
-              </ProtectedRoute>
-            }
+            element={<OperationsPage />}
           />
           
           <Route

@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -24,12 +24,19 @@ const Navbar = () => {
           <Link to="/history" className="nav-link">History</Link>
         </div>
 
-        <div className="navbar-user">
-          <span className="user-name">{user?.fullName || user?.email}</span>
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
-        </div>
+        {isAuthenticated ? (
+          <div className="navbar-user">
+            <span className="user-name">{user?.fullName || user?.email}</span>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="navbar-auth-links">
+            <Link to="/login" className="auth-btn login-btn">Login</Link>
+            <Link to="/register" className="auth-btn register-btn">Register</Link>
+          </div>
+        )}
       </div>
     </nav>
   );
